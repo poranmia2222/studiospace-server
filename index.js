@@ -27,6 +27,7 @@ app.use(express.json())
 const mongoClient = await connectToMongoDB()
 const db = mongoClient.db('studiospace')
 const studiosCollection = db.collection('studios')
+const bookingCollection = db.collection('bookings')
 
 app.get('/', (req, res) => {
     res.send('server is runing')
@@ -49,7 +50,11 @@ app.get('/studios/:id', async(req, res)=>{
     res.send(result)
 })
 
-
+app.post('/booking', async(req, res)=>{
+  const newBooking = req.body;
+  const result = await bookingCollection.insertOne(newBooking)
+  res.send(result)
+})
 
 app.listen(PORT, () => {
     console.log(`Server is runnging at ${PORT}`)
