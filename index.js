@@ -36,6 +36,13 @@ app.get('/studios', async(req, res)=>{
     const result = await studiosCollection.find().toArray()
     res.send(result)
 })
+
+app.post('/studios', async(req, res)=>{
+  const newStudio = req.body;
+  const result = await studiosCollection.insertOne(newStudio);
+  res.send(result)
+})
+
 app.get('/studios/:id', async(req, res)=>{
     const {id} = req.params
     const result = await studiosCollection.findOne({_id: new ObjectId(id)})
