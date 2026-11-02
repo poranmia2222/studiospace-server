@@ -30,44 +30,59 @@ const studiosCollection = db.collection('studios')
 const bookingCollection = db.collection('bookings')
 
 app.get('/', (req, res) => {
-    res.send('server is runing')
+  res.send('server is runing')
 })
 
-app.get('/studios', async(req, res)=>{
-    const result = await studiosCollection.find().toArray()
-    res.send(result)
+app.get('/studios', async (req, res) => {
+  const result = await studiosCollection.find().toArray()
+  res.send(result)
 })
 
-app.post('/studios', async(req, res)=>{
+app.post('/studios', async (req, res) => {
   const newStudio = req.body;
   const result = await studiosCollection.insertOne(newStudio);
   res.send(result)
 })
 
-app.get('/studios/:id', async(req, res)=>{
-    const {id} = req.params
-    const result = await studiosCollection.findOne({_id: new ObjectId(id)})
-    res.send(result)
+app.get('/studios/:id', async (req, res) => {
+  const { id } = req.params
+  const result = await studiosCollection.findOne({ _id: new ObjectId(id) })
+  res.send(result)
 })
 
-app.post('/booking', async(req, res)=>{
+app.patch('/studios/:id', async (req, res) => {
+  const { id } = req.params;
+  const updatedStudio = req.body;
+  const result = await studiosCollection.updateOne({ _id: new ObjectId(id) },
+    { $set: updatedStudio })
+  res.send(result)
+})
+
+app.delete('/studios/:id', async (req, res) => {
+  const { id } = req.params;
+  const result = await studiosCollection.deleteOne({ _id: new ObjectId(id) })
+  res.send(result)
+})
+
+app.post('/booking', async (req, res) => {
   const newBooking = req.body;
   const result = await bookingCollection.insertOne(newBooking)
   res.send(result)
 })
 
-app.get('/my-bookings/:email', async(req, res)=>{
-  const {email} = req.params;
-  const result = await bookingCollection.find({email: email}).toArray()
+app.get('/my-bookings/:email', async (req, res) => {
+  const { email } = req.params;
+  const result = await bookingCollection.find({ email: email }).toArray()
   res.send(result)
 })
 
-app.delete('/my-bookings/:id', async(req, res)=>{
-  const {id} = req.params;
-  const result = await bookingCollection.deleteOne({_id: new ObjectId(id)})
+app.delete('/my-bookings/:id', async (req, res) => {
+  const { id } = req.params;
+  const result = await bookingCollection.deleteOne({ _id: id })
   res.send(result)
+  console.log(result, id)
 })
 
 app.listen(PORT, () => {
-    console.log(`Server is runnging at ${PORT}`)
+  console.log(`Server is runnging at ${PORT}`)
 })
