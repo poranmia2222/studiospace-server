@@ -77,21 +77,43 @@ app.delete('/studios/:id', async (req, res) => {
 
 
 
+
 app.post('/booking', async (req, res) => {
   const newBooking = req.body;
-  const result = await bookingCollection.insertOne(newBooking)
-  res.send(result)
-})
+  const {date, startTime, endTime, title } = newBooking;
 
-app.get('/my-bookings/:email', async (req, res) => {
-  const { email } = req.params;
-  const result = await bookingCollection.find({ email: email }).toArray()
+  const existingBookings = await bookingCollection.find({
+    title: title,
+    date: date,
+  }).toArray();
+
+  const hasConflict = existingBookings.some(
+    booking => startTime < booking.endTime && endTime > booking.startTime
+  );
+
+  console.log(hasConflict)
+  if (hasConflict) {
+    return res.status(409).send({
+      message: "This studio is already booked for this time."
+    });
+  }
+
+  const result = await bookingCollection.insertOne(newBooking);
+  res.send(result);
+});
+
+
+
+
+app.get('/my-bookings/:emailId', async (req, res) => {
+  const { emailId } = req.params;
+  const result = await bookingCollection.find({ emailId: emailId }).toArray()
   res.send(result)
 })
 
 app.delete('/my-bookings/:id', async (req, res) => {
   const { id } = req.params;
-  const result = await bookingCollection.deleteOne({ _id: id })
+  const result = await bookingCollection.deleteOne({ _id: new ObjectId(id) })
   res.send(result)
   console.log(result, id)
 })
