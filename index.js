@@ -38,6 +38,11 @@ app.get('/studios', async (req, res) => {
   res.send(result)
 })
 
+app.get('/featured-studios', async (req, res) => {
+  const result = await studiosCollection.find().limit(6).toArray()
+  res.send(result)
+})
+
 app.post('/studios', async (req, res) => {
   const newStudio = req.body;
   const result = await studiosCollection.insertOne(newStudio);
@@ -58,11 +63,19 @@ app.patch('/studios/:id', async (req, res) => {
   res.send(result)
 })
 
+app.get('/studios/:email', async (req, res) => {
+  const { email } = req.params;
+  const result = await bookingCollection.find({ email: email }).toArray()
+  res.send(result)
+})
+
 app.delete('/studios/:id', async (req, res) => {
   const { id } = req.params;
   const result = await studiosCollection.deleteOne({ _id: new ObjectId(id) })
   res.send(result)
 })
+
+
 
 app.post('/booking', async (req, res) => {
   const newBooking = req.body;
