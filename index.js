@@ -1,11 +1,10 @@
 import express from 'express'
 import cors from "cors"
 import { MongoClient, ObjectId } from 'mongodb';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
 import 'dotenv/config'
 const app = express()
 const PORT = 8000
-
-
 
 
 
@@ -29,6 +28,33 @@ const db = mongoClient.db('studiospace')
 const studiosCollection = db.collection('studios')
 const bookingCollection = db.collection('bookings')
 
+
+
+const verifyToken = async (req, res, next) => {
+    const authHeader = req.headers.authorization
+    // console.log(authHeader)
+
+    if (!authHeader) {
+        return res.status(401).send({ msg: "Unauthorized" });
+    }
+
+    const token = authHeader.split(" ")[1]
+
+// console.log(token)
+    if (!token) {
+        return res.status(401).send({ msg: 'Unauthorized' })
+    }
+
+
+    const JWKS = createRemoteJWKSet(new URL(`${process.env.CLIENT_URL}/api/auth/jwks`))
+    const { payload } = await jwtVerify(token, JWKS)
+    console.log(payload)
+
+    next()
+}
+
+
+
 app.get('/', (req, res) => {
   res.send('server is runing')
 })
@@ -50,6 +76,13 @@ app.post('/studios', async (req, res) => {
 })
 
 app.get('/studios/:id', async (req, res) => {
+  const { id } = req.params
+  const result = await studiosCollection.findOne({ _id: new ObjectId(id) })
+  res.send(result)
+})
+
+
+app.get('/studio/:id', verifyToken , async (req, res) => {
   const { id } = req.params
   const result = await studiosCollection.findOne({ _id: new ObjectId(id) })
   res.send(result)
