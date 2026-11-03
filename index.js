@@ -31,27 +31,26 @@ const bookingCollection = db.collection('bookings')
 
 
 const verifyToken = async (req, res, next) => {
-    const authHeader = req.headers.authorization
-    // console.log(authHeader)
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send({ msg: "Unauthorized!" });
+  }
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).send({ msg: "Unauthorized!" });
+  }
 
-    if (!authHeader) {
-        return res.status(401).send({ msg: "Unauthorized" });
-    }
+  const JWKS = createRemoteJWKSet(
+    new URL(`${process.env.CLIENT_URL}/api/auth/jwks`),
+  );
 
-    const token = authHeader.split(" ")[1]
-
-// console.log(token)
-    if (!token) {
-        return res.status(401).send({ msg: 'Unauthorized' })
-    }
-
-
-    const JWKS = createRemoteJWKSet(new URL(`${process.env.CLIENT_URL}/api/auth/jwks`))
-    const { payload } = await jwtVerify(token, JWKS)
-    console.log(payload)
-
-    next()
-}
+  try { 
+    const { payload } = await jwtVerify(token, JWKS);
+    next();
+  } catch (error) {
+    return res.status(500).send({ msg: "Server Error!" });
+  }
+};
 
 
 
