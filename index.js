@@ -69,7 +69,7 @@ app.get('/featured-studios', async (req, res) => {
   res.send(result)
 })
 
-app.post('/studios', async (req, res) => {
+app.post('/studios', verifyToken, async (req, res) => {
   const newStudio = req.body;
   const result = await studiosCollection.insertOne(newStudio);
   res.send(result)
@@ -88,7 +88,7 @@ app.get('/studio/:id', verifyToken , async (req, res) => {
   res.send(result)
 })
 
-app.patch('/studios/:id', async (req, res) => {
+app.patch('/studios/:id', verifyToken, async (req, res) => {
   const { id } = req.params;
   const updatedStudio = req.body;
   const result = await studiosCollection.updateOne({ _id: new ObjectId(id) },
@@ -102,7 +102,7 @@ app.get('/studios/:email', async (req, res) => {
   res.send(result)
 })
 
-app.delete('/studios/:id', async (req, res) => {
+app.delete('/studios/:id',verifyToken, async (req, res) => {
   const { id } = req.params;
   const result = await studiosCollection.deleteOne({ _id: new ObjectId(id) })
   res.send(result)
@@ -111,7 +111,7 @@ app.delete('/studios/:id', async (req, res) => {
 
 
 
-app.post('/booking', async (req, res) => {
+app.post('/booking', verifyToken, async (req, res) => {
   const newBooking = req.body;
   const {date, startTime, endTime, title } = newBooking;
 
@@ -138,13 +138,31 @@ app.post('/booking', async (req, res) => {
 
 
 
-app.get('/my-bookings/:emailId', async (req, res) => {
+
+
+
+app.get("/booking/:id", verifyToken, async (req, res) => {
+
+    const { id } = req.params;
+    const booking = await bookingCollection.findOne({
+      _id: new ObjectId(id),
+    });
+    res.send(booking);
+});
+
+
+
+
+
+
+
+app.get('/my-bookings/:emailId', verifyToken, async (req, res) => {
   const { emailId } = req.params;
   const result = await bookingCollection.find({ emailId: emailId }).toArray()
   res.send(result)
 })
 
-app.delete('/my-bookings/:id', async (req, res) => {
+app.delete('/my-bookings/:id', verifyToken, async (req, res) => {
   const { id } = req.params;
   const result = await bookingCollection.deleteOne({ _id: new ObjectId(id) })
   res.send(result)
