@@ -140,7 +140,6 @@ app.post('/booking', verifyToken, async (req, res) => {
 
 
 
-
 app.get("/booking/:id", verifyToken, async (req, res) => {
 
     const { id } = req.params;
@@ -172,3 +171,12 @@ app.delete('/my-bookings/:id', verifyToken, async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is runnging at ${PORT}`)
 })
+
+
+
+
+
+
+
+
+export default app
